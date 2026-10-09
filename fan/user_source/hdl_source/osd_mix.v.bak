@@ -1,0 +1,65 @@
+module osd_mix(
+    input               pix_clk,
+    input               rst_n,
+
+    input               hsync_in,
+    input               vsync_in,
+    input               de_in,
+    input      [23:0]   rgb_in,
+
+    input      [11:0]   x_cnt,
+    input      [11:0]   y_cnt,
+
+    input               rom_pixel,
+
+    output reg          hsync_out,
+    output reg          vsync_out,
+    output reg          de_out,
+    output reg [23:0]   rgb_out,
+    output     [9:0]    rom_addr
+);
+
+// 测试坐标：左上角，靠近原厂logo，方便观察
+localparam OSD_X_START = 20;
+localparam OSD_Y_START = 200;
+localparam OSD_W       = 32;
+localparam OSD_H       = 32;
+localparam OSD_COLOR   = 24'hFF0000; // 纯红色
+
+wire osd_active;
+wire [11:0] x_offset;
+wire [11:0] y_offset;
+
+assign osd_active = (x_cnt >= OSD_X_START) && (x_cnt < OSD_X_START + OSD_W)
+                 && (y_cnt >= OSD_Y_START) && (y_cnt < OSD_Y_START + OSD_H);
+
+assign x_offset = x_cnt - OSD_X_START;
+assign y_offset = y_cnt - OSD_Y_START;
+assign rom_addr = { y_offset[4:0], x_offset[4:0] };
+
+// 测试模式：屏蔽ROM，区域内强制显示红色
+wire draw_osd;
+assign draw_osd = osd_active;
+
+// 所有信号同步打1拍，时序完全对齐
+always @(posedge pix_clk or negedge rst_n) begin
+    if(!rst_n) begin
+        hsync_out <= 1'b0;
+        vsync_out <= 1'b0;
+        de_out    <= 1'b0;
+        rgb_out   <= 24'd0;
+    end
+    else begin
+        hsync_out <= hsync_in;
+        vsync_out <= vsync_in;
+        de_out    <= de_in;
+        if(draw_osd) begin
+            rgb_out <= OSD_COLOR;
+        end
+        else begin
+            rgb_out <= rgb_in;
+        end
+    end
+end
+
+endmodule

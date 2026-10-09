@@ -1,0 +1,31 @@
+module osd_coord(
+    input               pix_clk,
+    input               rst_n,
+    input               de_in,
+    input               vsync_in,
+
+    output reg [11:0]   x_cnt,
+    output reg [11:0]   y_cnt
+);
+
+// X坐标：de高电平时计数，每行自动清零
+always @(posedge pix_clk or negedge rst_n) begin
+    if(!rst_n)
+        x_cnt <= 12'd0;
+    else if(de_in)
+        x_cnt <= x_cnt + 12'd1;
+    else
+        x_cnt <= 12'd0;
+end
+
+// Y坐标：vsync低脉冲复位，每行结束加1
+always @(posedge pix_clk or negedge rst_n) begin
+    if(!rst_n)
+        y_cnt <= 12'd0;
+    else if(!vsync_in)
+        y_cnt <= 12'd0;
+    else if( (de_in == 1'b0) && (x_cnt != 12'd0) )
+        y_cnt <= y_cnt + 12'd1;
+end
+
+endmodule

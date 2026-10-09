@@ -1,0 +1,32 @@
+module icon_rom(
+    input               clk,
+    input      [9:0]    addr,
+    output reg          rom_pixel
+);
+
+reg [31:0] rom_mem [0:31];
+
+initial begin
+    rom_mem[00] = 32'h00000000; rom_mem[01] = 32'h00000000;
+    rom_mem[02] = 32'h0003C000; rom_mem[03] = 32'h0003C000;
+    rom_mem[04] = 32'h0003C000; rom_mem[05] = 32'h0003C000;
+    rom_mem[06] = 32'h0003C000; rom_mem[07] = 32'h0003C000;
+    rom_mem[08] = 32'h0003C000; rom_mem[09] = 32'h0003C000;
+    rom_mem[10] = 32'h0003C000; rom_mem[11] = 32'h0003C000;
+    rom_mem[12] = 32'h0003C000; rom_mem[13] = 32'h0003C000;
+    rom_mem[14] = 32'h0003C000; rom_mem[15] = 32'h0003C000;
+    rom_mem[16] = 32'h0003C000; rom_mem[17] = 32'h0003C000;
+    rom_mem[18] = 32'h0003C000; rom_mem[19] = 32'h0003C000;
+    rom_mem[20] = 32'h00000000; rom_mem[21] = 32'h00000000;
+    rom_mem[22] = 32'h00000000; rom_mem[23] = 32'h0007E000;
+    rom_mem[24] = 32'h0007E000; rom_mem[25] = 32'h0007E000;
+    rom_mem[26] = 32'h0007E000; rom_mem[27] = 32'h00000000;
+    rom_mem[28] = 32'h00000000; rom_mem[29] = 32'h00000000;
+    rom_mem[30] = 32'h00000000; rom_mem[31] = 32'h00000000;
+end
+
+always @(posedge clk) begin
+    rom_pixel <= rom_mem[addr[9:5]][31 - addr[4:0]];
+end
+
+endmodule

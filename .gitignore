@@ -1,0 +1,9 @@
+*.bit
+*.bin
+*.rpt
+*.10g
+dbg/
+_synthesis/
+_implementation/
+work/
+sim/
